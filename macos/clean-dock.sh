@@ -89,10 +89,6 @@ PLIST_END
     fi
 done
 
-# Also add the Applications folder to the Dock
-echo "Adding Applications folder to Dock..."
-defaults write com.apple.dock persistent-others -array-add '<dict><key>tile-data</key><dict><key>arrangement</key><integer>0</integer><key>displayas</key><integer>0</integer><key>file-data</key><dict><key>_CFURLString</key><string>file://'$HOME'/Applications</string><key>_CFURLStringType</key><integer>15</integer></dict><key>file-label</key><string>Applications</string><key>file-type</key><integer>2</integer><key>label</key><string>Applications</string></dict><key>tile-type</key><string>directory-tile</string></dict>'
-
 # Restart Dock to apply changes
 echo "Restarting Dock..."
 killall Dock
