@@ -1,13 +1,58 @@
 #!/bin/zsh
 
+# COLOR
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+# Ask for the administrator password upfront.
+echo Enter root password
+sudo -v
+
+# Keep Sudo until script is finished
+while true; do
+  sudo -n true
+  sleep 60
+  kill -0 "$$" || exit
+done 2>/dev/null &
+
+# Update macOS
+echo
+echo "${GREEN}Searching for updates."
+sudo softwareupdate -i -a
+
+# Homebrew
+sudo xcode-select --install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Login Window Message
+sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText "If my calculations are correct, when this baby hits eighty-eight miles per hour... you're gonna see some serious shit."
+
+# Check the model and set hostname accordingly
+if [[ "$model_name" == *"Mac mini"* ]]; then
+    echo "Running command for Mac mini..."
+    sudo scutil --set ComputerName "Marty"
+    sudo scutil --set LocalHostName "marty"
+elif [[ "$model_name" == *"MacBook Air"* ]]; then
+    echo "Running command for MacBook Air..."
+    sudo scutil --set ComputerName "Einstein"
+    sudo scutil --set LocalHostName "einstein"
+    defaults write -g NSForceSoftwareVideoDecoder -bool true
+    defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
+else
+    echo "Unknown model: $model_name"
+fi
+
 # Dock settings
 defaults write com.apple.dock "tilesize" -int "46"
 defaults write com.apple.dock "autohide" -bool "true"
 defaults write com.apple.dock "autohide-time-modifier" -float "0.5"
-defaults write com.apple.dock "mineffect" -string "suck"
 defaults write NSGlobalDomain "AppleShowAllExtensions" -bool "true"
 defaults write com.apple.dock "expose-group-apps" -bool "true"
 defaults write com.apple.dock showAppExposeGestureEnabled -int 1
+# defaults write com.apple.dock "mineffect" -string "suck"
 killall Dock
 
 # Finder settings
@@ -38,7 +83,7 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeF
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -int "0"
 defaults write com.apple.TextEdit "SmartQuotes" -bool "false"
 defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "false"
-defaults write com.apple.universalaccess mouseDriverCursorSize -float 1.5
+defaults write com.apple.universalaccess mouseDriverCursorSize 1.5
 
 # Dont create .DS_Store Files On Network Or USB Volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
@@ -47,39 +92,24 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 # Spotlight - disable related content
 defaults write com.apple.Spotlight EnabledPreferenceRules '("Custom.relatedContents")'
 
+# Widgets - set appearance to light mode
+defaults write com.apple.widgets widgetAppearance 0
+
 # Get the model name of the local machine
 model_name=$(system_profiler SPHardwareDataType | awk '/Model Name/{print $3,$4,$5}')
 
-# Check the model and set hostname accordingly
-if [[ "$model_name" == *"Mac mini"* ]]; then
-    echo "Running command for Mac mini..."
-    scutil --set ComputerName "Marty"
-    scutil --set LocalHostName "marty"
-elif [[ "$model_name" == *"MacBook Air"* ]]; then
-    echo "Running command for MacBook Air..."
-    scutil --set ComputerName "Einstein"
-    scutil --set LocalHostName "einstein"
-    defaults write -g NSForceSoftwareVideoDecoder -bool true
-    defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
-else
-    echo "Unknown model: $model_name"
-fi
-
-# Zsh
+# Zsh profile
 touch ~/.zprofile
 echo 'echo "reading ~/.zprofile"' >> ~/.zprofile
 touch ~/.zshrc
 echo 'echo "reading ~/.zshrc"' >> ~/.zshrc
-
-# Homebrew
-xcode-select --install
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
+echo 'alias cls="clear"' >> ~/.zshrc
+echo 'alias drink="brew update && brew upgrade && brew cleanup"' >> ~/.zshrc
+echo 'export DEFAULT_USER=$USER' >> ~/.zshrc
+echo 'export HOMEBREW_NO_ENV_HINTS=1' >> ~/.zshrc
+echo 'cd /Users/aaron/projects' >> ~/.zshrc
+# echo 'clear' >> ~/.zshrc
 
 # Terminal
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 defaults import com.apple.Terminal ./TerminalPreferences.plist
-
-# Login Window Message
-sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText "If my calculations are correct, when this baby hits eighty-eight miles per hour... you're gonna see some serious shit."
