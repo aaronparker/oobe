@@ -35,14 +35,12 @@ if [[ "$model_name" == *"Mac mini"* ]]; then
     echo "Running command for Mac mini..."
     sudo scutil --set ComputerName "Marty"
     sudo scutil --set LocalHostName "marty"
-    cp ./Macmini-Brewfile.txt ~/.Brewfile
 elif [[ "$model_name" == *"MacBook Air"* ]]; then
     echo "Running command for MacBook Air..."
     sudo scutil --set ComputerName "Einstein"
     sudo scutil --set LocalHostName "einstein"
     defaults write -g NSForceSoftwareVideoDecoder -bool true
     defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
-    cp ./MacBookAir-Brewfile.txt ~/.Brewfile
 else
     echo "Unknown model: $model_name"
 fi
@@ -85,7 +83,7 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeF
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -int "0"
 defaults write com.apple.TextEdit "SmartQuotes" -bool "false"
 defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "false"
-defaults write com.apple.universalaccess mouseDriverCursorSize 1.5
+# defaults write com.apple.universalaccess mouseDriverCursorSize 1.5
 
 # Dont create .DS_Store Files On Network Or USB Volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
@@ -113,4 +111,20 @@ echo 'cd /Users/aaron/projects' >> ~/.zshrc
 defaults import com.apple.Terminal ./TerminalPreferences.plist
 
 # Run brew install
-brew bundle install
+if [[ "$model_name" == *"Mac mini"* ]]; then
+    echo "Running brew bundle for Mac mini..."
+    brew bundle install ./Macmini-Brewfile.txt
+elif [[ "$model_name" == *"MacBook Air"* ]]; then
+    echo "Running brew bundle for MacBook Air..."
+    brew bundle install ./MacBookAir-Brewfile.txt
+else
+    echo "Unknown model: $model_name"
+fi
+
+# Configure the dock pinned apps
+dockutil --remove all
+dockutil --add /Applications/Safari.app
+dockutil --add /Applications/Microsoft\ Edge.app
+dockutil --add /System/Applications/Calendar.app
+dockutil --add /Applications/Visual\ Studio\ Code.app
+dockutil --add /System/Applications/Utilities/Terminal.app --position right

@@ -6,3 +6,4 @@ Sources:
 * https://macos-defaults.com
 * https://ss64.com/mac/syntax-defaults.html
 * https://emmer.dev/blog/automate-your-macos-defaults/
+* https://mikefrobbins.com/2025/05/07/customize-and-automate-a-clean-macos-dock-layout/
