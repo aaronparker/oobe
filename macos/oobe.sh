@@ -52,7 +52,6 @@ defaults write com.apple.dock "autohide-time-modifier" -float "0.5"
 defaults write NSGlobalDomain "AppleShowAllExtensions" -bool "true"
 defaults write com.apple.dock "expose-group-apps" -bool "true"
 defaults write com.apple.dock showAppExposeGestureEnabled -int 1
-# defaults write com.apple.dock "mineffect" -string "suck"
 killall Dock
 
 # Finder settings
@@ -63,10 +62,11 @@ defaults write com.apple.finder "FXEnableExtensionChangeWarning" -bool "false"
 defaults write NSGlobalDomain "NSTableViewDefaultSizeMode" -int "3"
 defaults write com.apple.finder "_FXSortFoldersFirstOnDesktop" -bool "true"
 defaults write com.apple.finder _FXEnableColumnAutoSizing -bool YES
+defaults write com.apple.finder NewWindowTarget -string "Pfhm"
 killall Finder
 
 # Enable spanning of Spaces across multiple displays
-defaults write com.apple.spaces "spans-displays" -bool "true"
+defaults write com.apple.spaces "spans-displays" -bool "false"
 # killall SystemUIServer
 
 # Modify screenshot location
@@ -100,12 +100,14 @@ model_name=$(system_profiler SPHardwareDataType | awk '/Model Name/{print $3,$4,
 
 # Zsh profile
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+echo '' >> ~/.zshrc
 echo 'alias cls="clear"' >> ~/.zshrc
+echo 'alias dir="ls -l"' >> ~/.zshrc
 echo 'alias drink="brew update && brew upgrade && brew cleanup"' >> ~/.zshrc
 echo 'export DEFAULT_USER=$USER' >> ~/.zshrc
 echo 'export HOMEBREW_NO_ENV_HINTS=1' >> ~/.zshrc
 echo 'cd /Users/aaron/projects' >> ~/.zshrc
-# echo 'clear' >> ~/.zshrc
+echo '' >> ~/.zshrc
 
 # Terminal
 defaults import com.apple.Terminal ./TerminalPreferences.plist
@@ -127,4 +129,4 @@ dockutil --add /Applications/Safari.app
 dockutil --add /Applications/Microsoft\ Edge.app
 dockutil --add /System/Applications/Calendar.app
 dockutil --add /Applications/Visual\ Studio\ Code.app
-dockutil --add /System/Applications/Utilities/Terminal.app --position right
+dockutil --add /System/Applications/Utilities/Terminal.app
