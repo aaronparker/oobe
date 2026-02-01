@@ -35,12 +35,14 @@ if [[ "$model_name" == *"Mac mini"* ]]; then
     echo "Running command for Mac mini..."
     sudo scutil --set ComputerName "Marty"
     sudo scutil --set LocalHostName "marty"
+    cp ./Macmini-Brewfile.txt ~/.Brewfile
 elif [[ "$model_name" == *"MacBook Air"* ]]; then
     echo "Running command for MacBook Air..."
     sudo scutil --set ComputerName "Einstein"
     sudo scutil --set LocalHostName "einstein"
     defaults write -g NSForceSoftwareVideoDecoder -bool true
     defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
+    cp ./MacBookAir-Brewfile.txt ~/.Brewfile
 else
     echo "Unknown model: $model_name"
 fi
@@ -99,10 +101,7 @@ defaults write com.apple.widgets widgetAppearance 0
 model_name=$(system_profiler SPHardwareDataType | awk '/Model Name/{print $3,$4,$5}')
 
 # Zsh profile
-touch ~/.zprofile
-echo 'echo "reading ~/.zprofile"' >> ~/.zprofile
-touch ~/.zshrc
-echo 'echo "reading ~/.zshrc"' >> ~/.zshrc
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 echo 'alias cls="clear"' >> ~/.zshrc
 echo 'alias drink="brew update && brew upgrade && brew cleanup"' >> ~/.zshrc
 echo 'export DEFAULT_USER=$USER' >> ~/.zshrc
@@ -111,5 +110,7 @@ echo 'cd /Users/aaron/projects' >> ~/.zshrc
 # echo 'clear' >> ~/.zshrc
 
 # Terminal
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 defaults import com.apple.Terminal ./TerminalPreferences.plist
+
+# Run brew install
+brew bundle install
