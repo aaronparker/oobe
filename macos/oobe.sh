@@ -125,6 +125,7 @@ echo '' >> ~/.zshrc
 
 # PowerShell profile
 echo Copy PowerShell profile
+mkdir -p ~/.config/powershell
 cp ./Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 
 # Terminal
