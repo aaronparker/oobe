@@ -112,6 +112,8 @@ defaults write com.apple.widgets widgetAppearance 0
 # Zsh profile
 echo Install ohmyzsh and set zsh profile
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+cp ./agnoster.zsh-theme ~/.oh-my-zsh/themes/agnoster.zsh-theme
+
 echo '' >> ~/.zshrc
 echo 'alias cls="clear"' >> ~/.zshrc
 echo 'alias dir="ls -l"' >> ~/.zshrc
@@ -120,6 +122,10 @@ echo 'export DEFAULT_USER=$USER' >> ~/.zshrc
 echo 'export HOMEBREW_NO_ENV_HINTS=1' >> ~/.zshrc
 echo 'cd /Users/aaron/projects' >> ~/.zshrc
 echo '' >> ~/.zshrc
+
+# PowerShell profile
+echo Copy PowerShell profile
+cp ./Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 
 # Terminal
 echo Import Terminal preferences
@@ -145,3 +151,8 @@ dockutil --add /Applications/Microsoft\ Edge.app
 dockutil --add /System/Applications/Calendar.app
 dockutil --add /Applications/Visual\ Studio\ Code.app
 dockutil --add /System/Applications/Utilities/Terminal.app
+
+# Create directories
+echo Create directories
+mkdir ~/projects
+mkdir ~/Virtual\ Machines
