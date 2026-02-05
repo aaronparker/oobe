@@ -71,6 +71,7 @@ defaults write NSGlobalDomain "NSTableViewDefaultSizeMode" -int "3"
 defaults write com.apple.finder "_FXSortFoldersFirstOnDesktop" -bool "true"
 defaults write com.apple.finder _FXEnableColumnAutoSizing -bool YES
 defaults write com.apple.finder NewWindowTarget -string "Pfhm"
+defaults write "com.apple.finder" "NSToolbar Configuration Browser" '{"TB Default Item Identifiers"=("com.apple.finder.BACK","com.apple.finder.SWCH",NSToolbarSpaceItem,"com.apple.finder.ARNG",NSToolbarSpaceItem,"com.apple.finder.SHAR","com.apple.finder.LABL","com.apple.finder.ACTN",NSToolbarSpaceItem,"com.apple.finder.SRCH",);"TB Display Mode"=2;"TB Icon Size Mode"=1;"TB Is Shown"=1;"TB Item Identifiers"=("com.apple.finder.BACK","com.apple.finder.SWCH",NSToolbarSpaceItem,"com.apple.finder.ARNG",NSToolbarSpaceItem,"com.apple.finder.SHAR","com.apple.finder.NFLD","com.apple.finder.TRSH","com.apple.finder.LABL","com.apple.finder.ACTN",NSToolbarSpaceItem,"com.apple.finder.SRCH",);"TB Size Mode"=1;}'
 killall Finder
 
 # Enable spanning of Spaces across multiple displays
