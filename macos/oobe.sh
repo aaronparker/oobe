@@ -88,8 +88,8 @@ defaults write com.apple.screencapture "location" -string "~/Pictures/Screenshot
 defaults write com.apple.screencapture "show-thumbnail" -bool "false"
 killall SystemUIServer
 
-# Trackpad and TextEdit settings
-echo Trackpad and other settings
+# Trackpad settings
+echo Trackpad settings
 defaults write com.apple.AppleMultitouchTrackpad "DragLock" -bool "true"
 defaults write com.apple.AppleMultitouchTrackpad "TrackpadThreeFingerDrag" -bool "true"
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -int "1"
@@ -102,12 +102,13 @@ defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
 # Spotlight - disable related content
-echo Splotlight settings
+echo Spotlight settings
 defaults write com.apple.Spotlight EnabledPreferenceRules '("Custom.relatedContents")'
 
 # TextEdit - disable smart quotes
 echo TextEdit settings
 defaults write com.apple.TextEdit "SmartQuotes" -bool "false"
+defaults write com.apple.TextEdit "RichText" -bool "false"
 
 # Zsh profile
 echo Install ohmyzsh and set zsh profile
