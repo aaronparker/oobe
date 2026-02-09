@@ -10,23 +10,12 @@ echo Enter root password
 sudo -v
 
 # Keep Sudo until script is finished
-while true; do
-  sudo -n true
-  sleep 60
-  kill -0 "$$" || exit
-done 2>/dev/null &
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 # Update macOS
 echo
 echo "${GREEN}Searching for updates."
 sudo softwareupdate -i -a
-
-# Homebrew
-echo Installing Homebrew
-# sudo xcode-select --install
-NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Login Window Message
 echo Setting login window message
@@ -47,14 +36,18 @@ elif [[ "$model_name" == *"MacBook Air"* ]]; then
     sudo scutil --set LocalHostName "einstein"
     defaults write -g NSForceSoftwareVideoDecoder -bool true
     defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
+elif [[ "$model_name" == *"Apple Virtual Machine"* ]]; then
+    echo "Running commands for macOS VM..."
+    sudo scutil --set ComputerName "Strickland"
+    sudo scutil --set LocalHostName "strickland"
 else
-    echo "Unknown model: $model_name"
+    echo "${RED}Unknown model: $model_name${NC}"
 fi
 
 # Dock settings
 echo Dock settings
 defaults write com.apple.dock "tilesize" -int "46"
-defaults write com.apple.dock "autohide" -bool "true"
+# defaults write com.apple.dock "autohide" -bool "true"
 defaults write com.apple.dock "autohide-time-modifier" -float "0.5"
 defaults write NSGlobalDomain "AppleShowAllExtensions" -bool "true"
 defaults write com.apple.dock "expose-group-apps" -bool "true"
@@ -74,10 +67,19 @@ defaults write com.apple.finder NewWindowTarget -string "Pfhm"
 defaults write "com.apple.finder" "NSToolbar Configuration Browser" '{"TB Default Item Identifiers"=("com.apple.finder.BACK","com.apple.finder.SWCH",NSToolbarSpaceItem,"com.apple.finder.ARNG",NSToolbarSpaceItem,"com.apple.finder.SHAR","com.apple.finder.LABL","com.apple.finder.ACTN",NSToolbarSpaceItem,"com.apple.finder.SRCH",);"TB Display Mode"=2;"TB Icon Size Mode"=1;"TB Is Shown"=1;"TB Item Identifiers"=("com.apple.finder.BACK","com.apple.finder.SWCH",NSToolbarSpaceItem,"com.apple.finder.ARNG",NSToolbarSpaceItem,"com.apple.finder.SHAR","com.apple.finder.NFLD","com.apple.finder.TRSH","com.apple.finder.LABL","com.apple.finder.ACTN",NSToolbarSpaceItem,"com.apple.finder.SRCH",);"TB Size Mode"=1;}'
 killall Finder
 
-# Enable spanning of Spaces across multiple displays
-echo Spaces settings
+# Window management  and desktop settings
+echo Window management and desktop settings
 defaults write com.apple.spaces "spans-displays" -bool "false"
-# killall SystemUIServer
+defaults write com.apple.WindowManager "EnableTiledWindowMargins" -bool true
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -int "0"
+defaults write com.apple.WindowManager "StageManagerHideWidgets" -bool true
+defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "false"
+
+# Widgets - set appearance to light mode
+echo Configure widgets
+defaults write com.apple.widgets widgetAppearance 0
+defaults write com.apple.chronod "remoteWidgetsEnabled" -bool false
+defaults write com.apple.chronod "effectiveRemoteWidgetsEnabled" -bool false
 
 # Modify screenshot location
 echo Screenshot settings
@@ -92,9 +94,6 @@ defaults write com.apple.AppleMultitouchTrackpad "DragLock" -bool "true"
 defaults write com.apple.AppleMultitouchTrackpad "TrackpadThreeFingerDrag" -bool "true"
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -int "1"
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -int "1"
-defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -int "0"
-defaults write com.apple.TextEdit "SmartQuotes" -bool "false"
-defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "false"
 # defaults write com.apple.universalaccess mouseDriverCursorSize 1.5
 
 # Dont create .DS_Store Files On Network Or USB Volumes
@@ -103,18 +102,17 @@ defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
 # Spotlight - disable related content
-echo Disable Spotlight related content
+echo Splotlight settings
 defaults write com.apple.Spotlight EnabledPreferenceRules '("Custom.relatedContents")'
 
-# Widgets - set appearance to light mode
-echo Set widgets to light mode
-defaults write com.apple.widgets widgetAppearance 0
+# TextEdit - disable smart quotes
+echo TextEdit settings
+defaults write com.apple.TextEdit "SmartQuotes" -bool "false"
 
 # Zsh profile
 echo Install ohmyzsh and set zsh profile
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 cp ./agnoster.zsh-theme ~/.oh-my-zsh/themes/agnoster.zsh-theme
-
 echo '' >> ~/.zshrc
 echo 'alias cls="clear"' >> ~/.zshrc
 echo 'alias dir="ls -l"' >> ~/.zshrc
@@ -133,6 +131,18 @@ cp ./Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_
 echo Import Terminal preferences
 defaults import com.apple.Terminal ./TerminalPreferences.plist
 
+# Create directories
+echo Create directories
+mkdir ~/projects
+mkdir ~/Virtual\ Machines
+
+# Homebrew
+echo Installing Homebrew
+# sudo xcode-select --install
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # Run brew install
 echo Run brew bundle based on model
 if [[ "$model_name" == *"Mac mini"* ]]; then
@@ -141,8 +151,11 @@ if [[ "$model_name" == *"Mac mini"* ]]; then
 elif [[ "$model_name" == *"MacBook Air"* ]]; then
     echo "Running brew bundle for MacBook Air..."
     brew bundle install --file ./MacBookAir-Brewfile.txt
+elif [[ "$model_name" == *"Apple Virtual Machine"* ]]; then
+    echo "Running brew bundle for macOS VM..."
+    brew bundle install --file ./Brewfile-MacVM.txt
 else
-    echo "Unknown model: $model_name"
+    echo "${RED}Unknown model: $model_name${NC}"
 fi
 
 # Configure the dock pinned apps
@@ -153,8 +166,3 @@ dockutil --add /Applications/Microsoft\ Edge.app
 dockutil --add /System/Applications/Calendar.app
 dockutil --add /Applications/Visual\ Studio\ Code.app
 dockutil --add /System/Applications/Utilities/Terminal.app
-
-# Create directories
-echo Create directories
-mkdir ~/projects
-mkdir ~/Virtual\ Machines

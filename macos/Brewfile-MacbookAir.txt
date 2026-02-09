@@ -42,7 +42,6 @@ cask "whatsapp"
 mas "1Password for Safari", id: 1569813296
 mas "Windows App", id: 1295203466
 vscode "adpyke.codesnap"
-vscode "cloudflare.cloudflare-workers-bindings-extension"
 vscode "davidbwaters.macos-modern-theme"
 vscode "emilast.logfilehighlighter"
 vscode "github.copilot-chat"
