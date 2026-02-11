@@ -110,24 +110,6 @@ echo TextEdit settings
 defaults write com.apple.TextEdit "SmartQuotes" -bool "false"
 defaults write com.apple.TextEdit "RichText" -bool "false"
 
-# Zsh profile
-echo Install ohmyzsh and set zsh profile
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-cp ./agnoster.zsh-theme ~/.oh-my-zsh/themes/agnoster.zsh-theme
-echo '' >> ~/.zshrc
-echo 'alias cls="clear"' >> ~/.zshrc
-echo 'alias dir="ls -l"' >> ~/.zshrc
-echo 'alias drink="brew update && brew upgrade && brew cleanup"' >> ~/.zshrc
-echo 'export DEFAULT_USER=$USER' >> ~/.zshrc
-echo 'export HOMEBREW_NO_ENV_HINTS=1' >> ~/.zshrc
-echo 'cd /Users/aaron/projects' >> ~/.zshrc
-echo '' >> ~/.zshrc
-
-# PowerShell profile
-echo Copy PowerShell profile
-mkdir -p ~/.config/powershell
-cp ./Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_profile.ps1
-
 # Terminal
 echo Import Terminal preferences
 defaults import com.apple.Terminal ./TerminalPreferences.plist
@@ -159,11 +141,40 @@ else
     echo "${RED}Unknown model: $model_name${NC}"
 fi
 
+# Zsh profile
+echo Install ohmyzsh and set zsh profile
+export RUNZSH=no
+export CHSH=no
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+cp ./agnoster.zsh-theme ~/.oh-my-zsh/themes/agnoster.zsh-theme
+echo '' >> ~/.zshrc
+echo 'alias cls="clear"' >> ~/.zshrc
+echo 'alias dir="ls -l"' >> ~/.zshrc
+echo 'alias drink="brew update && brew upgrade && brew cleanup"' >> ~/.zshrc
+echo 'export DEFAULT_USER=$USER' >> ~/.zshrc
+echo 'export HOMEBREW_NO_ENV_HINTS=1' >> ~/.zshrc
+echo 'cd /Users/aaron/projects' >> ~/.zshrc
+echo '' >> ~/.zshrc
+
+# PowerShell profile
+echo Copy PowerShell profile
+mkdir -p ~/.config/powershell
+cp ./Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_profile.ps1
+
 # Configure the dock pinned apps
 echo Configure the dock pinned apps
 dockutil --remove all
 dockutil --add /Applications/Safari.app
-dockutil --add /Applications/Microsoft\ Edge.app
 dockutil --add /System/Applications/Calendar.app
-dockutil --add /Applications/Visual\ Studio\ Code.app
+if [ -e "/Applications/Microsoft Edge.app" ]; then
+    dockutil --add /Applications/Microsoft\ Edge.app
+fi
+if [ -e "/Applications/Visual Studio Code.app" ]; then
+    dockutil --add /Applications/Visual\ Studio\ Code.app
+fi
 dockutil --add /System/Applications/Utilities/Terminal.app
+
+# Run brew bundle for apps that require sudo
+echo "Running brew bundle for sudo apps"
+echo "This will prompt for your password again."
+brew install git-credential-manager powershell microsoft-excel microsoft-powerpoint microsoft-teams microsoft-word
