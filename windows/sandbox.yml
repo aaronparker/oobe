@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+
+###############################################################################
+# Create Windows Sandbox instance with WinGet installed.                      #
+# Run as Administrator                                                        #
+# Mount C:\Sandbox on the local filesystem into the Sandbox filesystem.       #
+# The Logon command performs the following steps in Windows PowerShell:       #
+# 1. Set the execution policy to RemoteSigned                                 #
+# 2. Download and install App Installer (WinGet) and it's dependencies        #
+############################################################################### 
+
+properties:
+  resources:
+    - resource: Microsoft.WindowsSandbox.DSC/WindowsSandbox
+      directives:
+        description: Create Windows Sandbox with Winget installed
+        allowPrerelease: true
+      settings:
+        Ensure: Present
+        # You could also provide a custom .wsb file to open (look at the next point further down) with the Windows Sandbox,
+        # but the following parameters will override the values from it.
+        # WsbFile: <Provide a custom .wsb file to open.>
+        
+        # The Logon command is in essence a powershell  script that will be executed when the sandbox is started. First it installs the Windows package manager.
+        LogonCommand: >
+          cmd /c start powershell -NoExit -Command "$progressPreference = 'silentlyContinue';
+          Set-ExecutionPolicy Bypass -Force;
+          Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle;
+          Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx -OutFile Microsoft.VCLibs.x64.14.00.Desktop.appx;
+          Invoke-WebRequest -Uri https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx -OutFile Microsoft.UI.Xaml.2.8.x64.appx;
+          Add-AppxPackage Microsoft.VCLibs.x64.14.00.Desktop.appx;
+          Add-AppxPackage Microsoft.UI.Xaml.2.8.x64.appx;
+          Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle;
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force;
+          Install-Module -Name Evergreen -Force
+        # HostFolder: D:\
+        # SandboxFolder: C:\Files
+        # ReadOnly: false
+        # MemoryInMB: 4096
+        vGPU: true
+        # AudioInput: true
+        # ClipboardRedirection: true
+        Networking: true
+        # PrinterRedirection: false
+        # ProtectedClient: false
+        # VideoInput: true
+  configurationVersion: 0.2.0
