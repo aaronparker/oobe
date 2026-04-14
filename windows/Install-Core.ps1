@@ -144,8 +144,8 @@ $DotNet.x64, $DotNet.x86 | ForEach-Object {
 # Install the Microsoft Windows App SDK
 # https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
 $AppSdk = @{
-    x64   = "https://aka.ms/windowsappsdk/1.7/latest/windowsappruntimeinstall-x64.exe"
-    arm64 = "https://aka.ms/windowsappsdk/1.7/latest/windowsappruntimeinstall-arm64.exe"
+    x64   = "https://aka.ms/windowsappsdk/1.8/1.8.260317003/windowsappruntimeinstall-x64.exe"
+    arm64 = "https://aka.ms/windowsappsdk/1.8/1.8.260317003/windowsappruntimeinstall-arm64.exe"
 }
 switch ($Env:PROCESSOR_ARCHITECTURE) {
     "AMD64" {
@@ -271,7 +271,6 @@ Remove-Item -Path $Path -Recurse -Force -ErrorAction "SilentlyContinue"
 
 # Trust the PSGallery for modules
 Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Install NuGet, PowerShellGet"
-# Register-PackageSource -Name "NuGet" -Location "https://api.nuget.org/v3/index.json" -ProviderName "NuGet" -Trusted -Confirm:$false
 Install-PackageProvider -Name "PowerShellGet" -MinimumVersion "2.2.5" -Force
 Set-PSRepository -Name "PSGallery" -InstallationPolicy "Trusted"
 
