@@ -130,10 +130,10 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 echo Run brew bundle based on model
 if [[ "$model_name" == *"Mac mini"* ]]; then
     echo "Running brew bundle for Mac mini..."
-    brew bundle install --file ./Macmini-Brewfile.txt
+    brew bundle install --file ./Brewfile-Macmini.txt
 elif [[ "$model_name" == *"MacBook Air"* ]]; then
     echo "Running brew bundle for MacBook Air..."
-    brew bundle install --file ./MacBookAir-Brewfile.txt
+    brew bundle install --file ./Brewfile-MacBookAir.txt
 elif [[ "$model_name" == *"Apple Virtual Machine"* ]]; then
     echo "Running brew bundle for macOS VM..."
     brew bundle install --file ./Brewfile-MacVM.txt
