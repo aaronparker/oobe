@@ -144,8 +144,8 @@ $DotNet.x64, $DotNet.x86 | ForEach-Object {
 # Install the Microsoft Windows App SDK
 # https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
 $AppSdk = @{
-    x64   = "https://aka.ms/windowsappsdk/1.8/1.8.260317003/windowsappruntimeinstall-x64.exe"
-    arm64 = "https://aka.ms/windowsappsdk/1.8/1.8.260317003/windowsappruntimeinstall-arm64.exe"
+    x64   = "https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-x64.exe"
+    arm64 = "https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-arm64.exe"
 }
 switch ($Env:PROCESSOR_ARCHITECTURE) {
     "AMD64" {
