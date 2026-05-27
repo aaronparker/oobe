@@ -38,8 +38,6 @@ This directory contains utility scripts for Windows system configuration and app
 - Internet connectivity
 - Windows 10/11 or Windows Server 2016-2025
 
----
-
 ### Update-StoreApp.ps1
 
 **Purpose**: Updates Microsoft Store applications using the Windows Runtime API for programmatic app updates.
@@ -90,8 +88,6 @@ Get-AppxPackage | Where-Object { $_.NonRemovable -eq $false -and $_.IsFramework 
 - Implements asynchronous operation handling for update tasks
 - Includes built-in retry logic and error handling
 - Progress reporting through Write-Progress cmdlet
-
----
 
 ### Set-Language.ps1
 
@@ -150,21 +146,22 @@ Get-AppxPackage | Where-Object { $_.NonRemovable -eq $false -and $_.IsFramework 
 - Virtual desktop infrastructure (VDI) customization
 - Windows Autopilot device configuration
 
----
-
 ## General Notes
 
 ### Execution Context
+
 - All scripts are designed to run in elevated (administrator) context
 - Scripts support both interactive and automated execution scenarios
 - Compatible with Windows deployment tools and frameworks
 
 ### Architecture Support
+
 - Install-Core.ps1 automatically detects and supports x64 and ARM64 architectures
 - Update-StoreApp.ps1 works with all Windows Store supported architectures
 - Set-Language.ps1 is architecture-independent
 
 ### Integration
+
 These scripts can be integrated into:
 - Windows image customization workflows
 - Microsoft Deployment Toolkit (MDT) task sequences
@@ -174,6 +171,7 @@ These scripts can be integrated into:
 - Custom PowerShell Desired State Configuration (DSC) resources
 
 ### Best Practices
+
 - Test scripts in a non-production environment before deployment
 - Review and customize the default application lists in Update-StoreApp.ps1 for your organization
 - Verify language pack availability for your target language in Set-Language.ps1
