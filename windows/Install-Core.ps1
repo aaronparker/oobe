@@ -175,7 +175,7 @@ if ($null -eq (Get-AppxPackage | Where-Object { $_.Name -match "Terminal" })) {
         Expand-Archive -Path $OutFile -DestinationPath "$Path\Preinstall" -Force
         Get-ChildItem -Path "$Path\Preinstall" -Include "*$($Arch)__8wekyb3d8bbwe.appx" -Recurse | ForEach-Object {
             Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $($_.FullName)"
-            Add-AppxProvisionedPackage -Online -PackagePath $_.FullName -ForceApplicationShutdown -SkipLicense
+            Add-AppxProvisionedPackage -Online -PackagePath $_.FullName -SkipLicense
         }
     }
 
@@ -189,7 +189,7 @@ if ($null -eq (Get-AppxPackage | Where-Object { $_.Name -match "Terminal" })) {
         UseBasicParsing = $true
     }
     Invoke-WebRequest @params
-    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ForceApplicationShutdown -SkipLicense
+    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
 }
 
 # Install the Microsoft Windows App SDK
@@ -238,11 +238,11 @@ $params = @{
 Invoke-WebRequest @params
 try {
     Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
-    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ForceApplicationShutdown -SkipLicense
+    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
 }
 catch {
     Write-Information -MessageData "$($PSStyle.Foreground.Green)Retrying: $OutFile"
-    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ErrorAction "SilentlyContinue" -ForceApplicationShutdown -SkipLicense
+    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ErrorAction "SilentlyContinue" -SkipLicense
 }
 
 # PowerShell LTS
