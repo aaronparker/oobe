@@ -141,11 +141,63 @@ $DotNet.x64, $DotNet.x86 | ForEach-Object {
     Start-Process @params
 }
 
+# Install Windows Terminal
+if ($null -eq (Get-AppxPackage | Where-Object { $_.Name -match "Terminal" })) {
+
+    # Set the processor architecture
+    switch ($Env:PROCESSOR_ARCHITECTURE) {
+        "AMD64" {
+            $Arch = "x64"
+        }
+        "ARM64" {
+            $Arch = "arm64"
+        }
+        default { throw "Unsupported architecture." }
+    }
+
+    # Get the latest release of Windows Terminal from GitHub
+    Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Get latest Windows Terminal release"
+    $WindowsTerminal = Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/terminal/releases/latest" | Select-Object -First 1
+    Write-Information -MessageData "$($PSStyle.Foreground.Green)Found: $($WindowsTerminal.tag_name)"
+    $Urls = $WindowsTerminal.assets.browser_download_url
+
+    # If the Microsoft.UI.Xaml2.8 preinstall kit is not present, download it for Windows 10
+    if ($null -eq (Get-AppxPackage | Where-Object { $_.Name -match "Microsoft.UI.Xaml2.8" })) {
+        Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: Microsoft.UI.Xaml2.8"
+        $PreinstallUrl = $Urls | Where-Object { $_ -match "msixbundle_Windows10_PreinstallKit.zip" }
+        $OutFile = "$Path\WindowsTerminal_Windows10_PreinstallKit.zip"
+        $params = @{
+            Uri             = $PreinstallUrl
+            OutFile         = $OutFile
+            UseBasicParsing = $true
+        }
+        Invoke-WebRequest @params
+        Expand-Archive -Path $OutFile -DestinationPath "$Path\Preinstall" -Force
+        Get-ChildItem -Path "$Path\Preinstall" -Include "*$($Arch)__8wekyb3d8bbwe.appx" -Recurse | ForEach-Object {
+            Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $($_.FullName)"
+            Add-AppxProvisionedPackage -Online -PackagePath $_.FullName -ForceApplicationShutdown -SkipLicense
+        }
+    }
+
+    # Download the Windows Terminal msixbundle
+    $TerminalUrl = $Urls | Where-Object { $_ -match "8wekyb3d8bbwe.msixbundle$" }
+    $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $TerminalUrl -Leaf)
+    Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $TerminalUrl"
+    $params = @{
+        Uri             = $TerminalUrl
+        OutFile         = $OutFile
+        UseBasicParsing = $true
+    }
+    Invoke-WebRequest @params
+    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ForceApplicationShutdown -SkipLicense
+}
+
 # Install the Microsoft Windows App SDK
 # https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
 $AppSdk = @{
-    x64   = "https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-x64.exe"
-    arm64 = "https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-arm64.exe"
+    x64   = "https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-x64.exe"
+    arm64 = "https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-arm64.exe"
+    x86   = "https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-x86.exe"
 }
 switch ($Env:PROCESSOR_ARCHITECTURE) {
     "AMD64" {
@@ -186,11 +238,11 @@ $params = @{
 Invoke-WebRequest @params
 try {
     Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
-    Add-AppxPackage -Path $OutFile
+    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ForceApplicationShutdown -SkipLicense
 }
 catch {
     Write-Information -MessageData "$($PSStyle.Foreground.Green)Retrying: $OutFile"
-    Add-AppxPackage -Path $OutFile -ErrorAction "SilentlyContinue" -ForceApplicationShutdown
+    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ErrorAction "SilentlyContinue" -ForceApplicationShutdown -SkipLicense
 }
 
 # PowerShell LTS
