@@ -51,6 +51,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
             Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
             $params = @{
                 FilePath     = $OutFile
@@ -66,6 +67,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
             Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
             $params = @{
                 FilePath     = $OutFile
@@ -92,6 +94,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
             Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
             $params = @{
                 FilePath     = $OutFile
@@ -107,6 +110,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
             Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
             $params = @{
                 FilePath     = $OutFile
@@ -131,6 +135,7 @@ $DotNet.x64, $DotNet.x86 | ForEach-Object {
     $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
     Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
     Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+    Get-ChildItem -Path $OutFile | Unblock-File
     Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
     $params = @{
         FilePath     = $OutFile
@@ -142,55 +147,49 @@ $DotNet.x64, $DotNet.x86 | ForEach-Object {
 }
 
 # Install Windows Terminal
-if ($null -eq (Get-AppxPackage | Where-Object { $_.Name -match "Terminal" })) {
-
-    # Set the processor architecture
-    switch ($Env:PROCESSOR_ARCHITECTURE) {
-        "AMD64" {
-            $Arch = "x64"
-        }
-        "ARM64" {
-            $Arch = "arm64"
-        }
-        default { throw "Unsupported architecture." }
-    }
-
-    # Get the latest release of Windows Terminal from GitHub
-    Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Get latest Windows Terminal release"
-    $WindowsTerminal = Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/terminal/releases/latest" | Select-Object -First 1
-    Write-Information -MessageData "$($PSStyle.Foreground.Green)Found: $($WindowsTerminal.tag_name)"
-    $Urls = $WindowsTerminal.assets.browser_download_url
-
-    # If the Microsoft.UI.Xaml2.8 preinstall kit is not present, download it for Windows 10
-    if ($null -eq (Get-AppxPackage | Where-Object { $_.Name -match "Microsoft.UI.Xaml2.8" })) {
-        Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: Microsoft.UI.Xaml2.8"
-        $PreinstallUrl = $Urls | Where-Object { $_ -match "msixbundle_Windows10_PreinstallKit.zip" }
-        $OutFile = "$Path\WindowsTerminal_Windows10_PreinstallKit.zip"
-        $params = @{
-            Uri             = $PreinstallUrl
-            OutFile         = $OutFile
-            UseBasicParsing = $true
-        }
-        Invoke-WebRequest @params
-        Expand-Archive -Path $OutFile -DestinationPath "$Path\Preinstall" -Force
-        Get-ChildItem -Path "$Path\Preinstall" -Include "*$($Arch)__8wekyb3d8bbwe.appx" -Recurse | ForEach-Object {
-            Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $($_.FullName)"
-            Add-AppxProvisionedPackage -Online -PackagePath $_.FullName -SkipLicense
-        }
-    }
-
-    # Download the Windows Terminal msixbundle
-    $TerminalUrl = $Urls | Where-Object { $_ -match "8wekyb3d8bbwe.msixbundle$" }
-    $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $TerminalUrl -Leaf)
-    Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $TerminalUrl"
-    $params = @{
-        Uri             = $TerminalUrl
-        OutFile         = $OutFile
-        UseBasicParsing = $true
-    }
-    Invoke-WebRequest @params
-    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
+# Get the latest release of Windows Terminal from GitHub
+Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Get latest Windows Terminal release"
+$WindowsTerminal = Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/terminal/releases/latest" | Select-Object -First 1
+Write-Information -MessageData "$($PSStyle.Foreground.Green)Found: $($WindowsTerminal.tag_name)"
+$Urls = $WindowsTerminal.assets.browser_download_url
+$PreinstallUrl = $Urls | Where-Object { $_ -match "msixbundle_Windows10_PreinstallKit.zip" }
+$OutFile = "$Path\WindowsTerminal_Windows10_PreinstallKit.zip"
+$params = @{
+    Uri             = $PreinstallUrl
+    OutFile         = $OutFile
+    UseBasicParsing = $true
 }
+Invoke-WebRequest @params
+Expand-Archive -Path $OutFile -DestinationPath "$Path\Preinstall" -Force
+Get-ChildItem -Path "$Path\Preinstall" -Recurse | Unblock-File
+
+# Install or update the Microsoft.UI.Xaml2.8 package
+# $Packages = Get-AppxPackage | `
+#     Where-Object { $_.Name -match "Microsoft.UI.Xaml.2.8" -and $_.Architecture -eq $Env:PROCESSOR_ARCHITECTURE } | `
+#     Sort-Object -Property { [System.Version]$_.Version } -Descending | `
+#     Select-Object -First 1
+Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: Microsoft.UI.Xaml2.8"
+Get-ChildItem -Path "$Path\Preinstall" -Include "*.appx" -Recurse -Exclude "*_arm__*" | ForEach-Object {
+    if ($Env:PROCESSOR_ARCHITECTURE -eq "x64" -and $_.Name -match "_arm64__") {
+        Write-Information -MessageData "$($PSStyle.Foreground.Yellow)Skipping incompatible package: $($_.FullName)"
+        return
+    }
+    Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $($_.FullName)"
+    Add-AppxProvisionedPackage -Online -PackagePath $_.FullName -SkipLicense -ErrorAction "SilentlyContinue"
+}
+
+# Download the Windows Terminal msixbundle
+$TerminalUrl = $Urls | Where-Object { $_ -match "8wekyb3d8bbwe.msixbundle$" }
+$OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $TerminalUrl -Leaf)
+Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $TerminalUrl"
+$params = @{
+    Uri             = $TerminalUrl
+    OutFile         = $OutFile
+    UseBasicParsing = $true
+}
+Invoke-WebRequest @params
+Get-ChildItem -Path $OutFile | Unblock-File
+Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
 
 # Install the Microsoft Windows App SDK
 # https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
@@ -205,6 +204,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri (Resolve-Url -Url $_) -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
         }
     }
     "ARM64" {
@@ -212,6 +212,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri (Resolve-Url -Url $_) -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
         }
     }
     default { throw "Unsupported architecture." }
@@ -236,13 +237,14 @@ $params = @{
     UseBasicParsing = $true
 }
 Invoke-WebRequest @params
+Get-ChildItem -Path $OutFile | Unblock-File
 try {
     Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
     Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
 }
 catch {
-    Write-Information -MessageData "$($PSStyle.Foreground.Green)Retrying: $OutFile"
-    Add-AppxProvisionedPackage -Online -PackagePath $OutFile -ErrorAction "SilentlyContinue" -SkipLicense
+    # Write-Information -MessageData "$($PSStyle.Foreground.Green)Retrying: $OutFile"
+    # Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense -ErrorAction "SilentlyContinue"
 }
 
 # PowerShell LTS
@@ -258,6 +260,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
         }
     }
     "ARM64" {
@@ -265,6 +268,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
+            Get-ChildItem -Path $OutFile | Unblock-File
         }
     }
     default { throw "Unsupported architecture." }
@@ -287,6 +291,7 @@ $params = @{
     UseBasicParsing = $true
 }
 Invoke-WebRequest @params
+Get-ChildItem -Path $OutFile | Unblock-File
 [System.Xml.XmlDocument]$OneDriveXml = Get-Content -Path "$Path\OneDrive.xml" -Encoding "utf8"
 switch ($Env:PROCESSOR_ARCHITECTURE) {
     "AMD64" {
@@ -300,6 +305,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
 $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $Url -Leaf)
 Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $Url"
 Invoke-WebRequest -Uri $Url -OutFile $OutFile -UseBasicParsing
+Get-ChildItem -Path $OutFile | Unblock-File
 reg add "HKLM\Software\Microsoft\OneDrive" /v "AllUsersInstall" /t REG_DWORD /d 1 /reg:64 /f *> $null
 Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: $OutFile"
 $params = @{
@@ -323,7 +329,7 @@ Remove-Item -Path $Path -Recurse -Force -ErrorAction "SilentlyContinue"
 
 # Trust the PSGallery for modules
 Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Install NuGet, PowerShellGet"
-Install-PackageProvider -Name "PowerShellGet" -MinimumVersion "2.2.5" -Force
+Install-PackageProvider -Name "PowerShellGet" -MinimumVersion "2.2.5" -Force | Out-Null
 Set-PSRepository -Name "PSGallery" -InstallationPolicy "Trusted"
 
 # Install modules
