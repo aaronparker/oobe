@@ -170,7 +170,7 @@ Get-ChildItem -Path "$Path\Preinstall" -Recurse | Unblock-File
 #     Select-Object -First 1
 Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: Microsoft.UI.Xaml2.8"
 Get-ChildItem -Path "$Path\Preinstall" -Include "*.appx" -Recurse -Exclude "*_arm__*" | ForEach-Object {
-    if ($Env:PROCESSOR_ARCHITECTURE -eq "x64" -and $_.Name -match "_arm64__") {
+    if ($Env:PROCESSOR_ARCHITECTURE -eq "AMD64" -and $_.Name -match "_arm64__") {
         Write-Information -MessageData "$($PSStyle.Foreground.Yellow)Skipping incompatible package: $($_.FullName)"
         return
     }
@@ -333,5 +333,5 @@ Install-PackageProvider -Name "PowerShellGet" -MinimumVersion "2.2.5" -Force | O
 Set-PSRepository -Name "PSGallery" -InstallationPolicy "Trusted"
 
 # Install modules
-Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Install modules: Evergreen, PSWindowsUpdate, PSReadLine"
-Install-Module -Name "Evergreen", "PSWindowsUpdate", "PSReadLine" -AllowClobber -Force -Scope AllUsers
+Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Install modules: Evergreen, EvergreenUI, PSWindowsUpdate, PSReadLine"
+Install-Module -Name "Evergreen", "EvergreenUI", "PSWindowsUpdate", "PSReadLine" -AllowClobber -Force -Scope AllUsers
