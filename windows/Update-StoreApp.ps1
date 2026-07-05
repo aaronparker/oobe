@@ -120,4 +120,3 @@ function Update-StoreApp {
 
 # Get-AppxPackage to find all installed apps that are not removable and not framework apps, and then updates them
 Get-AppxPackage | Where-Object { $_.NonRemovable -eq $false } | Update-StoreApp
-    # Where-Object { $_.NonRemovable -eq $false -and $_.IsFramework -eq $false } | `

@@ -164,10 +164,6 @@ Expand-Archive -Path $OutFile -DestinationPath "$Path\Preinstall" -Force
 Get-ChildItem -Path "$Path\Preinstall" -Recurse | Unblock-File
 
 # Install or update the Microsoft.UI.Xaml2.8 package
-# $Packages = Get-AppxPackage | `
-#     Where-Object { $_.Name -match "Microsoft.UI.Xaml.2.8" -and $_.Architecture -eq $Env:PROCESSOR_ARCHITECTURE } | `
-#     Sort-Object -Property { [System.Version]$_.Version } -Descending | `
-#     Select-Object -First 1
 Write-Information -MessageData "$($PSStyle.Foreground.Green)Installing: Microsoft.UI.Xaml2.8"
 Get-ChildItem -Path "$Path\Preinstall" -Include "*.appx" -Recurse -Exclude "*_arm__*" | ForEach-Object {
     if ($Env:PROCESSOR_ARCHITECTURE -eq "AMD64" -and $_.Name -match "_arm64__") {
@@ -194,9 +190,9 @@ Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
 # Install the Microsoft Windows App SDK
 # https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
 $AppSdk = @{
-    x64   = "https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-x64.exe"
-    arm64 = "https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-arm64.exe"
-    x86   = "https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-x86.exe"
+    x64   = "https://aka.ms/windowsappsdk/2.2/2.2.0/windowsappruntimeinstall-x64.exe"
+    arm64 = "https://aka.ms/windowsappsdk/2.2/2.2.0/windowsappruntimeinstall-arm64.exe"
+    x86   = "https://aka.ms/windowsappsdk/2.2/2.2.0/windowsappruntimeinstall-x86.exe"
 }
 switch ($Env:PROCESSOR_ARCHITECTURE) {
     "AMD64" {
