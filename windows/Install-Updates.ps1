@@ -14,11 +14,10 @@ $ProgressPreference = [System.Management.Automation.ActionPreference]::SilentlyC
 Import-Module -Name "PSWindowsUpdate"
 $params = @{
     Install              = $true
-    Download             = $true
     AcceptAll            = $true
     MicrosoftUpdate      = $true
     IgnoreReboot         = $true
-    IgnoreRebootRequired = $true
-    IgnoreUserInput      = $true
+    # IgnoreRebootRequired = $true
+    # IgnoreUserInput      = $true
 }
 Install-WindowsUpdate @params

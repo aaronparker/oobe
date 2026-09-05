@@ -10,7 +10,7 @@ param (
 )
 
 # Configure the environment
-$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Continue
 $InformationPreference = [System.Management.Automation.ActionPreference]::Continue
 $ProgressPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
