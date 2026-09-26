@@ -63,7 +63,7 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
         }
     }
     "ARM64" {
-        $VcList.x86, $VcList.x64, $VcList.arm64 | ForEach-Object {
+        $VcList.x86, $VcList.arm64 | ForEach-Object {
             $OutFile = Join-Path -Path $Path -ChildPath (Split-Path -Path $_ -Leaf)
             Write-Information -MessageData "$($PSStyle.Foreground.Cyan)Download: $_"
             Invoke-WebRequest -Uri $_ -OutFile $OutFile -UseBasicParsing
@@ -124,8 +124,8 @@ switch ($Env:PROCESSOR_ARCHITECTURE) {
     default { throw "Unsupported architecture." }
 }
 
-# Install the Microsoft .NET 8.0
-$VersionUrl = "https://dotnetcli.blob.core.windows.net/dotnet/Runtime/8.0/latest.version"
+# Install the Microsoft .NET STS
+$VersionUrl = "https://dotnetcli.blob.core.windows.net/dotnet/Runtime/STS/latest.version"
 $Version = Invoke-RestMethod -Uri $VersionUrl -UseBasicParsing
 $DotNet = @{
     x64 = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/$Version/windowsdesktop-runtime-$Version-win-x64.exe"
@@ -190,9 +190,9 @@ Add-AppxProvisionedPackage -Online -PackagePath $OutFile -SkipLicense
 # Install the Microsoft Windows App SDK
 # https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
 $AppSdk = @{
-    x64   = "https://aka.ms/windowsappsdk/2.2/2.2.0/windowsappruntimeinstall-x64.exe"
-    arm64 = "https://aka.ms/windowsappsdk/2.2/2.2.0/windowsappruntimeinstall-arm64.exe"
-    x86   = "https://aka.ms/windowsappsdk/2.2/2.2.0/windowsappruntimeinstall-x86.exe"
+    x64   = "https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-x64.exe"
+    arm64 = "https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-arm64.exe"
+    x86   = "https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-x86.exe"
 }
 switch ($Env:PROCESSOR_ARCHITECTURE) {
     "AMD64" {
